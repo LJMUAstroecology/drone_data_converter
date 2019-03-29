@@ -4,9 +4,13 @@ This application converts data files captured using visible and thermal cameras.
 
 It is specifically designed to work with the data produced by the Astro-Ecology Raspberry Pi based thermal/visible imaging system.
 
+## Installation
+
 This is a standalone application. It does not need to be installed, although you may need to run `vc_redistx64.exe` prior to launching the application to install some C++ libraries.
 
 To download the most recent release, please go [here](https://github.com/LJMUAstroecology/drone_data_converter/releases) and download `drone_image_converter.zip`. Extract the zip file and run `data_converter.exe`.
+
+## Usage
 
 The application is simple: you provide an input folder containing the data files from a flight, and an output folder (by default this is set to the input folder). The output is:
 
