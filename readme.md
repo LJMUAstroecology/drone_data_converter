@@ -1,6 +1,8 @@
 # Data conversion utility for Astro-Ecology thermal/visible drone
 
-This application converts data files captured using visible and thermal cameras.
+This application converts data files captured using visible and thermal cameras from Astro Ecology's drones.
+
+!["screenshot"](data_converter.PNG)
 
 It is specifically designed to work with the data produced by the Astro-Ecology Raspberry Pi based thermal/visible imaging system.
 
@@ -32,4 +34,4 @@ Note:
 * For every `thermal_*.dat` file, there _must_ be a corresponding `thermal_offset*.txt` file. If this offset file doesn't exist, the software won't know how to split the raw data into images.
 * If only thermal data is present, the output video frame rate is set to 20Hz, otherwise it is set to 7Hz. This corresponds to the setup on the capture system.
 
-!["screenshot"](data_converter.PNG)
+
