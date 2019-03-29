@@ -32,4 +32,4 @@ Note:
 * For every `thermal_*.dat` file, there _must_ be a corresponding `thermal_offset*.txt` file. If this offset file doesn't exist, the software won't know how to split the raw data into images.
 * If only thermal data is present, the output video frame rate is set to 20Hz, otherwise it is set to 7Hz. This corresponds to the setup on the capture system.
 
-!["screenshot"](.\data_converter.PNG)
+!["screenshot"](data_converter.PNG)
