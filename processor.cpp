@@ -57,8 +57,30 @@ void processor::processRGB(void){
             auto offset = offsets[j];
             auto output_size = offsets[j+1]-offsets[j];
 
+            if(output_size == 0) continue;
+
             QString filename = QString("%1/%2/frame_%3.jpg").arg(output_folder).arg("rgb").arg(frame_count, 5, 10, QChar('0'));
             emit logInfo(filename);
+
+            auto split_buffer = data_buffer.mid(offset, output_size);
+
+            QFile output(filename);
+            if(output.open(QIODevice::WriteOnly)){
+                output.write(split_buffer);
+            }
+            output.close();
+
+            emit currentImage(filename);
+
+            cv::Mat raw_image;
+
+            try{
+                std::vector<char> data(split_buffer.data(), split_buffer.data()+split_buffer.size());
+                raw_image = cv::imdecode(data, cv::IMREAD_UNCHANGED);
+            }catch(...){
+                emit logWarning("Failed to export image");
+                continue;
+            }
 
             if(output_gps.isOpen() && latitude.size() >= frame_count && latitude.size() > 0){
                     QTextStream stream( &output_gps );
@@ -72,19 +94,6 @@ void processor::processRGB(void){
                                   .arg(longitude[frame_count])
                                   .arg(altitude[frame_count]));
             }
-
-            auto split_buffer = data_buffer.mid(offset, output_size);
-
-            QFile output(filename);
-            if(output.open(QIODevice::WriteOnly)){
-                output.write(split_buffer);
-            }
-            output.close();
-
-            emit currentImage(filename);
-
-            std::vector<char> data(split_buffer.data(), split_buffer.data()+split_buffer.size());
-            cv::Mat raw_image = cv::imdecode(data, cv::IMREAD_UNCHANGED);
 
             if(writer == nullptr){
                 writer = new cv::VideoWriter(video_filename.toStdString(), fourcc, output_fps, raw_image.size());
@@ -223,6 +232,8 @@ void processor::processThermal(void){
             auto offset = offsets[j];
             auto output_size = offsets[j+1]-offsets[j];
 
+            if(output_size == 0) continue;
+
             QString filename = QString("%1/%2/frame_%3.tiff").arg(output_folder).arg("raw").arg(frame_count, 5, 10, QChar('0'));
             auto split_buffer = data_buffer.mid(offset, output_size);
             emit logInfo(filename);
@@ -233,6 +244,15 @@ void processor::processThermal(void){
             }
 
             output.close();
+            cv::Mat raw_image;
+
+            try {
+                std::vector<char> data(split_buffer.data(), split_buffer.data()+split_buffer.size());
+                raw_image = cv::imdecode(data, cv::IMREAD_UNCHANGED);
+            } catch (...) {
+                emit logWarning("Couldn't save thermal image");
+                continue;
+            }
 
             if(output_gps.isOpen() && latitude.size() >= frame_count && latitude.size() > 0){
                 QTextStream stream( &output_gps );
@@ -247,8 +267,7 @@ void processor::processThermal(void){
                               .arg(altitude[frame_count]));
             }
 
-            std::vector<char> data(split_buffer.data(), split_buffer.data()+split_buffer.size());
-            cv::Mat raw_image = cv::imdecode(data, cv::IMREAD_UNCHANGED);
+
 
             double min=0, max=0;
 
@@ -271,14 +290,17 @@ void processor::processThermal(void){
             }
 
             QString preview_filename = QString("%1/%2/frame_%3.tiff").arg(output_folder).arg("preview").arg(frame_count, 5, 10, QChar('0'));
-            cv::imwrite(preview_filename.toStdString(), preview_frame);
-            emit currentImage(preview_filename);
 
-            if(writer->isOpened()){
-                writer->write(preview_frame);
+            if(!preview_frame.empty()){
+                cv::imwrite(preview_filename.toStdString(), preview_frame);
+                emit currentImage(preview_filename);
+
+                if(writer->isOpened()){
+                    writer->write(preview_frame);
+                }
+
+                frame_count++;
             }
-
-            frame_count++;
 
             double fraction = 100.0 /thermal_files.size();
             double subfraction = fraction*static_cast<double>(j) / offsets.size();
