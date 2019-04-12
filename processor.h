@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QApplication>
+#include <QDebug>
 
 #include <opencv2/opencv.hpp>
 

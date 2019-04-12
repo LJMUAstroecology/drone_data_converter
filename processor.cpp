@@ -176,13 +176,13 @@ void processor::processGPS(void){
     altitude.clear();
 
     while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        auto coords = line.simplified().split(',');
+        QByteArray line = file.readLine().simplified();
+        auto coords = line.split(',');
 
-        if(coords.size() == 3){
-            latitude.append(coords[0].toDouble());
-            longitude.append(coords[1].toDouble());
-            altitude.append(coords[2].toDouble());
+        if(coords.size() >= 3){
+            latitude.append(coords[0].simplified().toDouble());
+            longitude.append(coords[1].simplified().toDouble());
+            altitude.append(coords[2].simplified().toDouble());
         }else{
             latitude.append(0);
             longitude.append(0);
